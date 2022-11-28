@@ -1,0 +1,30 @@
+{{- $relname := .Release.Name -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  labels:
+{{- include "mycharts.systemlabels" $ | indent 4  }}
+{{- include "mycharts.version" . | indent 4 }}
+data:
+  myvalue: "Sample Config Map"
+  costCode: {{ .Values.costCode }}
+  Zone: {{ quote .Values.infra.zone }}
+  Region: {{ quote .Values.infra.region }}
+  ProjectCode: {{ upper .Values.projectCode | quote }}
+  now:  {{ now | date "2006-01-02" | quote }}
+  contact: {{ .Values.contact | default "1-800-111-1234" | quote }}
+{{- if eq .Values.infra.region "us-east" }}
+  ha: true
+{{- else if eq .Values.infra.region "us-west" }}
+  ha: false
+  this: thing
+{{- end }}
+{{- with .Values.tags }}
+  release_name: {{ $.Release.Name }}
+  Machine_Type: {{ .machine | default "NA" | quote }}
+  Rack_ID: {{ .machine |  quote }}
+  Storage_Type: {{ .drive | upper | quote }}
+  Video_Card: {{ .vcard | quote }}
+{{- end }}
+  orgdomain: {{ .Values.global.orgdomain | quote}}
